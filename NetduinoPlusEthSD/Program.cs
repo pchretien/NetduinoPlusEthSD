@@ -18,8 +18,8 @@ namespace NetduinoPlusEthSD
         private bool pin13Value;
         private readonly OutputPort pin13 = new OutputPort(Pins.GPIO_PIN_D13, false);
 
-        private bool pin7Value;
-        private readonly OutputPort pin7 = new OutputPort(Pins.GPIO_PIN_D7, false);
+        private static bool pin7Value;
+        private static readonly OutputPort pin7 = new OutputPort(Pins.GPIO_PIN_D7, false);
 
         private int a0Value;
         private readonly AnalogInput a0 = new AnalogInput(Pins.GPIO_PIN_A0);
@@ -38,7 +38,9 @@ namespace NetduinoPlusEthSD
             Port.ResistorMode.PullUp,
             Port.InterruptMode.InterruptEdgeLow
             );
-        
+
+        private Thread ledThread = null;
+
         public static void Main()
         {
             // Create and initialize the program instance
@@ -59,7 +61,20 @@ namespace NetduinoPlusEthSD
             // Start timers
             me.InitTimers();
 
+            me.ledThread = new Thread(LedThread);
+            me.ledThread.Start();
+
             Thread.Sleep(Timeout.Infinite);
+        }
+
+        private static void LedThread()
+        {
+            while (true)
+            {
+                pin7Value = !pin7Value;
+                pin7.Write(pin7Value);
+                Thread.Sleep(1000);
+            }
         }
 
         private void InitNetwork()
