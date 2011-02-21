@@ -18,6 +18,9 @@ namespace NetduinoPlusEthSD
         private bool pin13Value;
         private readonly OutputPort pin13 = new OutputPort(Pins.GPIO_PIN_D13, false);
 
+        private bool pin7Value;
+        private readonly OutputPort pin7 = new OutputPort(Pins.GPIO_PIN_D7, false);
+
         private int a0Value;
         private readonly AnalogInput a0 = new AnalogInput(Pins.GPIO_PIN_A0);
 
@@ -29,8 +32,8 @@ namespace NetduinoPlusEthSD
         private Timer lightTimer;
         private Timer watchDogTimer;
 
-        private readonly InterruptPort pin2 = new InterruptPort(
-            Pins.GPIO_PIN_D2, 
+        private readonly InterruptPort pin8 = new InterruptPort(
+            Pins.GPIO_PIN_D8, 
             true,
             Port.ResistorMode.PullUp,
             Port.InterruptMode.InterruptEdgeLow
@@ -98,7 +101,7 @@ namespace NetduinoPlusEthSD
         {
             a0.SetRange(0, 1024);
             a1.SetRange(0, 1024);
-            pin2.OnInterrupt += new NativeEventHandler(this.OnInterrupt);
+            pin8.OnInterrupt += new NativeEventHandler(this.OnInterrupt);
         }
 
         private bool VolumeExist()
@@ -165,7 +168,10 @@ namespace NetduinoPlusEthSD
         private void OnInterrupt(uint port, uint state, DateTime time)
         {
             Debug.Print("Pin="+port+" State="+state+" Time"+time);
-            pin2.ClearInterrupt();
+            pin8.ClearInterrupt();
+
+            pin7Value = !pin7Value;
+            pin7.Write(pin7Value);
         }
 
         private void SetTime()
